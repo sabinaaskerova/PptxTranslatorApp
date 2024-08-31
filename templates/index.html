@@ -1,0 +1,32 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Translate PPTX</title>
+</head>
+
+<body>
+    <h1>PowerPoint Presentation Translator</h1>
+    <form action="/translate" method="post" enctype="multipart/form-data">
+        <label for="src_lang">Source Language:</label>
+        <select name="src_lang" id="src_lang">
+            <option value="en">English</option>
+            <option value="ru">Russian</option>
+        </select>
+        <br>
+        <label for="tgt_lang">Target Language:</label>
+        <select name="tgt_lang" id="tgt_lang">
+            <option value="ru">Russian</option>
+            <option value="en">English</option>
+        </select>
+        <br>
+        <label for="file">Select PPTX File:</label>
+        <input type="file" name="file" id="file" required>
+        <br><br>
+        <input type="submit" value="Translate">
+    </form>
+</body>
+
+</html>
