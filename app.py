@@ -42,5 +42,21 @@ def translate():
         
         return send_file(translated_file_path, as_attachment=True)
 
+@app.teardown_request
+def teardown_cleanup(exception=None): #ensures that files are cleaned up even if an exception occurs during request processing.
+    try:
+        for filename in os.listdir(app.config['OUTPUT_FOLDER']):
+            file_path = os.path.join(app.config['OUTPUT_FOLDER'], filename)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        for filename in os.listdir(app.config['UPLOAD_FOLDER']):
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+    except Exception as e:
+        print(f"Error during teardown cleanup: {e}")
+
 if __name__ == '__main__':
     app.run(debug=True)
+    
