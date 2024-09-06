@@ -4,3 +4,4 @@ requests
 transformers
 torch
 sentencepiece
+sacremoses # to avoid user warning in transformers
