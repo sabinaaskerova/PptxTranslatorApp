@@ -63,7 +63,6 @@
             event.preventDefault();
             const formData = new FormData(form);
 
-            // Show progress bar
             progressBarContainer.style.display = 'block';
             progressBarFill.style.width = '0%';
             progressBarFill.textContent = '0%';
@@ -71,25 +70,20 @@
             fetch('/translate', {
                 method: 'POST',
                 body: formData
-            }).then(response => {
-                if (response.ok) {
-                    return response.blob();
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Translation failed');
                 }
-                throw new Error('Translation failed');
-            }).then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'translated.pptx';
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            }).catch(error => {
+                pollProgress(formData.get('file').name);
+            })
+            .catch(error => {
                 console.error('Error:', error);
                 alert('Translation failed');
             });
+        });
 
-            // Start polling for progress updates
+        function pollProgress(filename) {
             const interval = setInterval(() => {
                 fetch('/progress')
                     .then(response => response.json())
@@ -98,16 +92,36 @@
                         progressBarFill.style.width = progress + '%';
                         progressBarFill.textContent = progress + '%';
 
+                        // If progress is 100%, check if the translation is done
                         if (progress >= 100) {
-                            clearInterval(interval); // Stop polling when progress reaches 100%
+                            clearInterval(interval); // Stop polling for progress
+                            checkCompletion(filename); // Check if translation is done
                         }
                     })
                     .catch(error => {
                         console.error('Error fetching progress:', error);
                         clearInterval(interval);
                     });
-            }, 1000); // Poll every second
-        });
+            }, 2000); // Poll every 2 sec
+        }
+
+        function checkCompletion(filename) {
+            const interval = setInterval(() => {
+                fetch('/check_completion')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.done) {
+                            clearInterval(interval); // Stop polling when complete
+                            //   file download
+                            window.location.href = `/download/${filename}`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking completion:', error);
+                        clearInterval(interval);
+                    });
+            }, 1500); 
+        }
     </script>
 </body>
 </html>

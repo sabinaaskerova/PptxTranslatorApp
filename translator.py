@@ -105,7 +105,7 @@ class PptxTranslator():
         
         prs = Presentation(translated_file_path)
         total_slides = len(prs.slides)
-        lock = Lock() # Lock to protect the shared variable slides_processed
+        slides_processed_lock = Lock()
         slides_processed = 0
         
         with ThreadPoolExecutor(max_workers=8) as slide_executor:
@@ -113,7 +113,7 @@ class PptxTranslator():
             
             for future in as_completed(futures):
                 try:
-                    with lock:
+                    with slides_processed_lock:
                         slides_processed += 1
                     progress = int((slides_processed / total_slides) * 100)
                     if progress_callback:
