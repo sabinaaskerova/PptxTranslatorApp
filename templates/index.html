@@ -1,15 +1,32 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Translate PPTX</title>
-</head>
+    <style>
+        #progress-container {
+            display: none;
+            margin-top: 20px;
+        }
 
+        #progress-bar {
+            width: 100%;
+            background-color: #ddd;
+        }
+
+        #progress-bar-fill {
+            width: 0%;
+            height: 30px;
+            background-color: #4CAF50;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
+    </style>
+</head>
 <body>
     <h1>PowerPoint Presentation Translator</h1>
-    <form action="/translate" method="post" enctype="multipart/form-data">
+    <form id="translation-form" action="/translate" method=POST enctype="multipart/form-data">
         <label for="src_lang">Source Language:</label>
         <select name="src_lang" id="src_lang">
             <option value="en">English</option>
@@ -24,9 +41,73 @@
         <br>
         <label for="file">Select PPTX File:</label>
         <input type="file" name="file" id="file" required>
+        <br>
+        <label for="ignore_terms">Ignore Terms File (Optional):</label>
+        <input type="file" name="ignore_terms" id="ignore_terms">
         <br><br>
         <input type="submit" value="Translate">
     </form>
-</body>
 
+    <div id="progress-container">
+        <div id="progress-bar">
+            <div id="progress-bar-fill">0%</div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('translation-form');
+        const progressBarContainer = document.getElementById('progress-container');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+
+            // Show progress bar
+            progressBarContainer.style.display = 'block';
+            progressBarFill.style.width = '0%';
+            progressBarFill.textContent = '0%';
+
+            fetch('/translate', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Translation failed');
+            }).then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'translated.pptx';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('Translation failed');
+            });
+
+            // Start polling for progress updates
+            const interval = setInterval(() => {
+                fetch('/progress')
+                    .then(response => response.json())
+                    .then(data => {
+                        const progress = data.progress;
+                        progressBarFill.style.width = progress + '%';
+                        progressBarFill.textContent = progress + '%';
+
+                        if (progress >= 100) {
+                            clearInterval(interval); // Stop polling when progress reaches 100%
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching progress:', error);
+                        clearInterval(interval);
+                    });
+            }, 1000); // Poll every second
+        });
+    </script>
+</body>
 </html>
