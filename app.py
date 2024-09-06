@@ -139,6 +139,9 @@ def download(filename):
 
     return send_file(translated_file_path, as_attachment=True)
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 
 if __name__ == '__main__':

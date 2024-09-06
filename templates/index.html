@@ -4,16 +4,56 @@
     <meta charset="UTF-8">
     <title>Translate PPTX</title>
     <style>
+body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        select, input[type="file"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
         #progress-container {
             display: none;
             margin-top: 20px;
         }
-
         #progress-bar {
             width: 100%;
             background-color: #ddd;
         }
-
         #progress-bar-fill {
             width: 0%;
             height: 30px;
@@ -22,29 +62,77 @@
             line-height: 30px;
             color: white;
         }
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #333;
+            color: white;
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+        }
+        footer a{
+            color: white;
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .btn-group button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+            flex-grow: 1;
+        }
+        .btn-group button:hover {
+            background-color: #45a049;
+        }
+        .btn-selected {
+            background-color: #333;
+        }
+        #about-link {
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>PowerPoint Presentation Translator</h1>
-    <form id="translation-form" action="/translate" method=POST enctype="multipart/form-data">
+    <form id="translation-form" action="/translate" method="POST" enctype="multipart/form-data">
         <label for="src_lang">Source Language:</label>
         <select name="src_lang" id="src_lang">
             <option value="en">English</option>
             <option value="ru">Russian</option>
         </select>
-        <br>
+        
         <label for="tgt_lang">Target Language:</label>
         <select name="tgt_lang" id="tgt_lang">
             <option value="ru">Russian</option>
             <option value="en">English</option>
         </select>
-        <br>
+        
         <label for="file">Select PPTX File:</label>
         <input type="file" name="file" id="file" required>
-        <br>
+        
         <label for="ignore_terms">Ignore Terms File (Optional):</label>
         <input type="file" name="ignore_terms" id="ignore_terms">
-        <br><br>
+        
         <input type="submit" value="Translate">
     </form>
 
@@ -53,6 +141,16 @@
             <div id="progress-bar-fill">0%</div>
         </div>
     </div>
+
+    <div id="about-link">
+        <a href="/about">About this project</a>
+    </div>
+    
+    <footer>
+        <a href="https://sabinaaskerova.github.io/">
+            Made by Sabina Askerova
+        </a>
+    </footer>
 
     <script>
         const form = document.getElementById('translation-form');
